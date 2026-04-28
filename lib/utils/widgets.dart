@@ -73,7 +73,7 @@ class SectionHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: AppColors.primary, size: 24),
@@ -134,7 +134,7 @@ class BigButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             gradient: LinearGradient(
-              colors: [color, color.withOpacity(0.8)],
+              colors: [color, color.withValues(alpha: 0.8)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -144,7 +144,7 @@ class BigButton extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Colors.white.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(icon, color: Colors.white, size: 30),
@@ -347,7 +347,7 @@ class _TimetableEntryCellState extends State<TimetableEntryCell> {
         border: Border.all(
           color: _isHovered
               ? Colors.blue.shade400
-              : accent.withOpacity(0.4),
+              : accent.withValues(alpha: 0.4),
           width: _isHovered ? 2 : 1,
         ),
         boxShadow: _isHovered
@@ -360,7 +360,7 @@ class _TimetableEntryCellState extends State<TimetableEntryCell> {
           // Small drag-handle icon so beginners know it is draggable.
           if (widget.onSwap != null)
             Icon(Icons.drag_indicator,
-                size: 12, color: accent.withOpacity(0.6)),
+                size: 12, color: accent.withValues(alpha: 0.6)),
           Text(
             widget.entry.subjectName,
             textAlign: TextAlign.center,
@@ -513,3 +513,4 @@ class _EmptySlotCellState extends State<EmptySlotCell> {
     );
   }
 }
+

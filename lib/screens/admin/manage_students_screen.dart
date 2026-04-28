@@ -99,7 +99,7 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         leading: CircleAvatar(
-          backgroundColor: AppTheme.primary.withOpacity(
+          backgroundColor: AppTheme.primary.withValues(alpha: 
               AppTheme.isDark(context) ? 0.2 : 0.1),
           radius: 24,
           child: Text(
@@ -403,7 +403,7 @@ class _StudentDialogState extends State<_StudentDialog> {
               const SizedBox(height: 12),
             ],
             DropdownButtonFormField<String>(
-              value: _selectedDeptId,
+              initialValue: _selectedDeptId,
               decoration: const InputDecoration(labelText: 'Department', prefixIcon: Icon(Icons.business_outlined)),
               items: _departments.map((d) => DropdownMenuItem(value: d.id, child: Text(d.name))).toList(),
               onChanged: (val) {
@@ -422,7 +422,7 @@ class _StudentDialogState extends State<_StudentDialog> {
               )
             else
               DropdownButtonFormField<String>(
-                value: _selectedSemester,
+                initialValue: _selectedSemester,
                 decoration: const InputDecoration(labelText: 'Semester/Class', prefixIcon: Icon(Icons.school_outlined)),
                 items: availableClasses.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
                 onChanged: (val) => setState(() => _selectedSemester = val),
@@ -491,3 +491,4 @@ class _StudentDialogState extends State<_StudentDialog> {
     );
   }
 }
+

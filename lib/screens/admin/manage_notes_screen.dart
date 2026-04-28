@@ -106,7 +106,7 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: fileColor.withOpacity(AppTheme.isDark(context) ? 0.2 : 0.1),
+            color: fileColor.withValues(alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(fileIcon, color: fileColor, size: 24),
@@ -265,7 +265,7 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(0.05),
+                      color: AppTheme.primary.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: selectedFileName != null
@@ -413,3 +413,4 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
     );
   }
 }
+

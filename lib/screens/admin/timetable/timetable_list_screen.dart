@@ -141,7 +141,7 @@ class _TimetableListScreenState extends State<TimetableListScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: AppTheme.success.withOpacity(0.1),
+                              color: AppTheme.success.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text('Published',
@@ -158,7 +158,7 @@ class _TimetableListScreenState extends State<TimetableListScreen> {
                             color: (hasConflicts
                                     ? AppTheme.error
                                     : AppTheme.success)
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(hasConflicts ? 'Conflict' : 'Clean',
@@ -228,3 +228,4 @@ class _TimetableListScreenState extends State<TimetableListScreen> {
     );
   }
 }
+

@@ -319,7 +319,7 @@ class _SubjectDialogState extends State<_SubjectDialog> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: _selectedDeptId,
+              initialValue: _selectedDeptId,
               decoration: const InputDecoration(labelText: 'Department'),
               items: _departments
                   .map(
@@ -343,7 +343,7 @@ class _SubjectDialogState extends State<_SubjectDialog> {
                   style: TextStyle(color: Colors.red))
             else
               DropdownButtonFormField<String>(
-                value: _selectedClassId,
+                initialValue: _selectedClassId,
                 decoration:
                     const InputDecoration(labelText: 'Class / Semester'),
                 items: availableClasses
@@ -363,7 +363,7 @@ class _SubjectDialogState extends State<_SubjectDialog> {
               ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String?>(
-              value: _selectedFacultyId,
+              initialValue: _selectedFacultyId,
               decoration:
                   const InputDecoration(labelText: 'Assign Faculty (Optional)'),
               items: [

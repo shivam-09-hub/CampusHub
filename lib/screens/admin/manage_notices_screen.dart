@@ -82,7 +82,7 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withOpacity(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 
                         AppTheme.isDark(context) ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -170,7 +170,7 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: audience,
+                  initialValue: audience,
                   decoration: const InputDecoration(
                     labelText: 'Target Audience',
                     prefixIcon: Icon(Icons.group_outlined),
@@ -242,3 +242,4 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
     );
   }
 }
+

@@ -46,7 +46,7 @@ class StudentNoticesScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B).withOpacity(
+                              color: const Color(0xFFF59E0B).withValues(alpha: 
                                   AppTheme.isDark(context) ? 0.2 : 0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -95,3 +95,4 @@ class StudentNoticesScreen extends StatelessWidget {
     );
   }
 }
+

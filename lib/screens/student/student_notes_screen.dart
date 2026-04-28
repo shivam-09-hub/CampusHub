@@ -50,7 +50,7 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.error_outline, size: 48,
-                      color: AppTheme.error.withOpacity(0.7)),
+                      color: AppTheme.error.withValues(alpha: 0.7)),
                   const SizedBox(height: 12),
                   Text('Failed to load notes',
                       style: TextStyle(color: AppTheme.textColor(context))),
@@ -147,7 +147,7 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: fileColor.withOpacity(AppTheme.isDark(context) ? 0.2 : 0.1),
+            color: fileColor.withValues(alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(fileIcon, color: fileColor, size: 24),
@@ -191,3 +191,4 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
     );
   }
 }
+

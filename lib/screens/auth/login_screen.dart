@@ -183,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.success.withOpacity(0.1),
+                  color: AppTheme.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.mark_email_read,
@@ -304,7 +304,7 @@ class _LoginScreenState extends State<LoginScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.3),
+            color: AppTheme.primary.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -321,7 +321,7 @@ class _LoginScreenState extends State<LoginScreen>
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -331,7 +331,7 @@ class _LoginScreenState extends State<LoginScreen>
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(icon, color: Colors.white, size: 36),
@@ -350,7 +350,7 @@ class _LoginScreenState extends State<LoginScreen>
               Text(
                 subtitle,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.85),
+                  color: Colors.white.withValues(alpha: 0.85),
                   fontSize: 15,
                 ),
               ),
@@ -410,7 +410,7 @@ class _LoginScreenState extends State<LoginScreen>
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppTheme.primary.withOpacity(isDark ? 0.15 : 0.08)
+              ? AppTheme.primary.withValues(alpha: isDark ? 0.15 : 0.08)
               : AppTheme.cardColor(context),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
@@ -427,9 +427,9 @@ class _LoginScreenState extends State<LoginScreen>
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppTheme.primary.withOpacity(isDark ? 0.25 : 0.15)
+                    ? AppTheme.primary.withValues(alpha: isDark ? 0.25 : 0.15)
                     : isDark
-                        ? Colors.white.withOpacity(0.05)
+                        ? Colors.white.withValues(alpha: 0.05)
                         : Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -579,12 +579,12 @@ class _LoginScreenState extends State<LoginScreen>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppTheme.isDark(context)
-                  ? Colors.amber.shade900.withOpacity(0.2)
+                  ? Colors.amber.shade900.withValues(alpha: 0.2)
                   : Colors.amber.shade50,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: AppTheme.isDark(context)
-                    ? Colors.amber.shade700.withOpacity(0.3)
+                    ? Colors.amber.shade700.withValues(alpha: 0.3)
                     : Colors.amber.shade200,
               ),
             ),
@@ -633,7 +633,7 @@ class _LoginScreenState extends State<LoginScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppTheme.primary.withOpacity(
+              color: AppTheme.primary.withValues(alpha: 
                   AppTheme.isDark(context) ? 0.2 : 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -758,3 +758,4 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 }
+

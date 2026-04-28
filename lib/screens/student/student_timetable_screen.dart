@@ -77,7 +77,7 @@ class _TimetableView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFFFCA28), width: 1.5),
                 boxShadow: isDark ? [] : [BoxShadow(
-                  color: Colors.amber.withOpacity(0.15), blurRadius: 8, offset: const Offset(0, 2))],
+                  color: Colors.amber.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 2))],
               ),
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -101,7 +101,7 @@ class _TimetableView extends StatelessWidget {
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFB300).withOpacity(isDark ? 0.3 : 0.2),
+                    color: const Color(0xFFFFB300).withValues(alpha: isDark ? 0.3 : 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text('RECESS', style: TextStyle(
@@ -122,7 +122,7 @@ class _TimetableView extends StatelessWidget {
                 dense: true,
                 leading: Container(width: 36, height: 36,
                   decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade200,
+                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(10)),
                   child: Center(child: Text('${slot + 1}',
                       style: TextStyle(
@@ -139,7 +139,7 @@ class _TimetableView extends StatelessWidget {
           // ── Subject slot ──
           final ci = project.subjects.firstWhere((s) => s.name == entry.subjectName, orElse: () => SubjectModel(id: '', name: '', facultyName: '', hoursPerWeek: 0)).colorIndex;
           final bg = isDark
-              ? AppTheme.subjectAccents[ci % AppTheme.subjectAccents.length].withOpacity(0.15)
+              ? AppTheme.subjectAccents[ci % AppTheme.subjectAccents.length].withValues(alpha: 0.15)
               : AppTheme.subjectColors[ci % AppTheme.subjectColors.length];
           final accent = AppTheme.subjectAccents[ci % AppTheme.subjectAccents.length];
 
@@ -156,3 +156,4 @@ class _TimetableView extends StatelessWidget {
     });
   }
 }
+

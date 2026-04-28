@@ -292,7 +292,7 @@ class _FacultyDialogState extends State<_FacultyDialog> {
           children: [
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(labelText: 'Department *'),
-              value: _selectedDeptId,
+              initialValue: _selectedDeptId,
               items: _departments.map((d) {
                 return DropdownMenuItem(value: d.id, child: Text(d.name));
               }).toList(),

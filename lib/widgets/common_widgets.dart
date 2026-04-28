@@ -72,8 +72,8 @@ class _DashboardCardState extends State<DashboardCard>
             boxShadow: AppTheme.adaptiveShadow(context),
             border: Border.all(
               color: isDark
-                  ? widget.color.withOpacity(0.25)
-                  : widget.color.withOpacity(0.12),
+                  ? widget.color.withValues(alpha: 0.25)
+                  : widget.color.withValues(alpha: 0.12),
             ),
           ),
           child: Column(
@@ -84,7 +84,7 @@ class _DashboardCardState extends State<DashboardCard>
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: widget.color.withOpacity(isDark ? 0.2 : 0.1),
+                      color: widget.color.withValues(alpha: isDark ? 0.2 : 0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(widget.icon, color: widget.color, size: 26),
@@ -95,7 +95,7 @@ class _DashboardCardState extends State<DashboardCard>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: widget.color.withOpacity(isDark ? 0.2 : 0.1),
+                        color: widget.color.withValues(alpha: isDark ? 0.2 : 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -169,7 +169,7 @@ class LoadingOverlay extends StatelessWidget {
         child,
         if (isLoading)
           Container(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             child: Center(
               child: Container(
                 padding: const EdgeInsets.all(32),
@@ -229,12 +229,12 @@ class EmptyStateWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppTheme.primary.withOpacity(isDark ? 0.15 : 0.08),
+                color: AppTheme.primary.withValues(alpha: isDark ? 0.15 : 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon,
                   size: 56,
-                  color: AppTheme.primary.withOpacity(isDark ? 0.6 : 0.4)),
+                  color: AppTheme.primary.withValues(alpha: isDark ? 0.6 : 0.4)),
             ),
             const SizedBox(height: 24),
             Text(title,
@@ -288,7 +288,7 @@ class StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppTheme.adaptiveShadow(context),
         border: isDark
-            ? Border.all(color: color.withOpacity(0.2))
+            ? Border.all(color: color.withValues(alpha: 0.2))
             : null,
       ),
       child: Column(
@@ -297,7 +297,7 @@ class StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(isDark ? 0.2 : 0.1),
+              color: color.withValues(alpha: isDark ? 0.2 : 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -448,7 +448,7 @@ class ThemeToggleButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(14),
         ),
         child: AnimatedBuilder(
@@ -466,3 +466,4 @@ class ThemeToggleButton extends StatelessWidget {
     );
   }
 }
+

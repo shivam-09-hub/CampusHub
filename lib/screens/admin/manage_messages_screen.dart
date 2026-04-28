@@ -176,7 +176,7 @@ class _ManageMessagesScreenState extends State<ManageMessagesScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: priority,
+                  initialValue: priority,
                   decoration: const InputDecoration(
                     labelText: 'Priority',
                     prefixIcon: Icon(Icons.flag_outlined),

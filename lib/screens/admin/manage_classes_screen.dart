@@ -47,7 +47,7 @@ class _ManageClassesScreenState extends State<ManageClassesScreen> {
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
-                    backgroundColor: AppTheme.success.withOpacity(
+                    backgroundColor: AppTheme.success.withValues(alpha: 
                         AppTheme.isDark(context) ? 0.2 : 0.15),
                     child: const Icon(Icons.class_, color: AppTheme.success),
                   ),
@@ -206,7 +206,7 @@ class _ClassDialogState extends State<_ClassDialog> {
           children: [
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(labelText: 'Department'),
-              value: _selectedDeptId,
+              initialValue: _selectedDeptId,
               items: _departments
                   .map((d) => DropdownMenuItem(value: d.id, child: Text(d.name)))
                   .toList(),
@@ -304,3 +304,4 @@ class _ClassDialogState extends State<_ClassDialog> {
     );
   }
 }
+

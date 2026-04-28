@@ -49,7 +49,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withOpacity(
+                      color: AppTheme.primary.withValues(alpha: 
                           AppTheme.isDark(context) ? 0.2 : 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -164,3 +164,4 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
     );
   }
 }
+

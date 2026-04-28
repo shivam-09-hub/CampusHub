@@ -482,9 +482,9 @@ class _ResultScreenState extends State<ResultScreen>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Row(children: [
           Container(
@@ -566,7 +566,7 @@ class _ResultScreenState extends State<ResultScreen>
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        color: AppTheme.success.withOpacity(0.08),
+        color: AppTheme.success.withValues(alpha: 0.08),
         child: const Row(children: [
           Icon(Icons.check_circle_outline, color: AppTheme.success, size: 18),
           SizedBox(width: 8),
@@ -583,8 +583,8 @@ class _ResultScreenState extends State<ResultScreen>
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       color: errors > 0
-          ? AppTheme.error.withOpacity(0.1)
-          : AppTheme.warning.withOpacity(0.12),
+          ? AppTheme.error.withValues(alpha: 0.1)
+          : AppTheme.warning.withValues(alpha: 0.12),
       child: Row(children: [
         Icon(
           _checkingMove ? Icons.sync : Icons.warning_amber_rounded,
@@ -671,7 +671,7 @@ class _ResultScreenState extends State<ResultScreen>
         border: Border.all(color: const Color(0xFFFFCA28), width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: Colors.amber.withOpacity(0.15),
+              color: Colors.amber.withValues(alpha: 0.15),
               blurRadius: 8,
               offset: const Offset(0, 2))
         ],
@@ -698,7 +698,7 @@ class _ResultScreenState extends State<ResultScreen>
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFB300).withOpacity(0.2),
+            color: const Color(0xFFFFB300).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(20),
           ),
           child: const Text('RECESS',
@@ -778,7 +778,7 @@ class _ResultScreenState extends State<ResultScreen>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                      color: accent.withOpacity(0.15),
+                      color: accent.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10)),
                   child: Text(_timeLabel(slot),
                       style: TextStyle(
@@ -902,7 +902,7 @@ class _ResultScreenState extends State<ResultScreen>
       height: 80,
       margin: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-          color: AppTheme.primary.withOpacity(0.1),
+          color: AppTheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8)),
       child: Center(
           child: Text(label.substring(0, 3).toUpperCase(),
@@ -925,7 +925,7 @@ class _ResultScreenState extends State<ResultScreen>
             border: Border.all(
                 color: entry.hasConflict
                     ? AppTheme.error
-                    : accent.withOpacity(0.4),
+                    : accent.withValues(alpha: 0.4),
                 width: entry.hasConflict ? 2 : 1)),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(
@@ -934,7 +934,7 @@ class _ResultScreenState extends State<ResultScreen>
                   : Icons.drag_indicator,
               size: 10,
               color:
-                  entry.hasConflict ? AppTheme.error : accent.withOpacity(0.5)),
+                  entry.hasConflict ? AppTheme.error : accent.withValues(alpha: 0.5)),
           Text(entry.subjectName,
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -991,7 +991,7 @@ class _ResultScreenState extends State<ResultScreen>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: Colors.white, boxShadow: [
         BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -4))
       ]),
@@ -1032,3 +1032,4 @@ class _DragData {
   final int slot;
   const _DragData(this.day, this.slot);
 }
+
