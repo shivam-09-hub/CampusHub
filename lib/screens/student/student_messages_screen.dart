@@ -10,8 +10,10 @@ class StudentMessagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Messages')),
+    return CampusScaffold(
+      title: 'Messages',
+      subtitle: 'Important college updates in one place.',
+      icon: Icons.mark_chat_unread_rounded,
       body: StreamBuilder<List<MessageModel>>(
         stream: SupabaseService().getMessages(),
         builder: (context, snapshot) {
@@ -32,7 +34,8 @@ class StudentMessagesScreen extends StatelessWidget {
             itemCount: messages.length,
             itemBuilder: (_, i) {
               final m = messages[i];
-              final date = DateFormat('MMM d, yyyy • h:mm a').format(m.createdAt);
+              final date =
+                  DateFormat('MMM d, yyyy • h:mm a').format(m.createdAt);
               Color pc;
               String pl;
               IconData pi;
@@ -43,7 +46,7 @@ class StudentMessagesScreen extends StatelessWidget {
                   pi = Icons.error_rounded;
                   break;
                 case 'important':
-                  pc = const Color(0xFFF59E0B);
+                  pc = AppTheme.accent;
                   pl = 'IMPORTANT';
                   pi = Icons.warning_rounded;
                   break;

@@ -9,6 +9,7 @@ import '../../../config/app_theme.dart';
 import '../../../services/supabase_service.dart';
 import '../../../utils/timetable_generator.dart';
 import '../../../utils/conflict_engine.dart';
+import '../../../widgets/common_widgets.dart';
 import 'result_screen.dart';
 
 class WizardScreen extends StatefulWidget {
@@ -38,6 +39,13 @@ class _WizardScreenState extends State<WizardScreen> {
   List<RoomModel> _rooms = [];
   List<FacultyAvailability> _availability = [];
   List<TimeSlotDef> _timeSlots = [];
+
+  // --- Semester date range ---
+  DateTime? _semesterStart;
+  DateTime? _semesterEnd;
+
+  // --- Slot duration (minutes) ---
+  int _slotDuration = 60;
 
   // --- Existing DB data for dropdowns ---
   final _supabaseService = SupabaseService();
@@ -323,13 +331,16 @@ class _WizardScreenState extends State<WizardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Create Timetable'), actions: [
+    return CampusScaffold(
+      title: 'Create Timetable',
+      subtitle: 'Build schedules with conflict checks and smart allocation.',
+      icon: Icons.auto_awesome_rounded,
+      actions: [
         TextButton(
             onPressed: _showResetDialog,
             child:
                 const Text('Reset', style: TextStyle(color: AppTheme.error))),
-      ]),
+      ],
       body: Column(children: [
         _buildProgress(),
         Expanded(
@@ -417,7 +428,9 @@ class _WizardScreenState extends State<WizardScreen> {
       if (_dbDepartments.isEmpty)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text('No departments found. Add them in the Admin Dashboard first.', style: TextStyle(color: AppTheme.error)),
+          child: Text(
+              'No departments found. Add them in the Admin Dashboard first.',
+              style: TextStyle(color: AppTheme.error)),
         ),
       const SizedBox(height: 16),
 
@@ -457,7 +470,9 @@ class _WizardScreenState extends State<WizardScreen> {
       if (_dbClasses.isEmpty)
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text('No classes found. Add them in the Admin Dashboard first.', style: TextStyle(color: AppTheme.error)),
+          child: Text(
+              'No classes found. Add them in the Admin Dashboard first.',
+              style: TextStyle(color: AppTheme.error)),
         ),
       const SizedBox(height: 20),
       Text('Working Days',
@@ -507,6 +522,131 @@ class _WizardScreenState extends State<WizardScreen> {
               .toList()),
       const SizedBox(height: 24),
       _sectionHeader('Time Slots (Editable)', Icons.access_time),
+
+      // --- Semester Date Range Picker ---
+      const SizedBox(height: 8),
+      Text('Semester Duration',
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              color: AppTheme.textColor(context))),
+      const SizedBox(height: 8),
+      Row(children: [
+        Expanded(
+          child: InkWell(
+            onTap: () async {
+              final picked = await AppTheme.showAppDatePicker(
+                context,
+                initialDate: _semesterStart ?? DateTime(2026, 8, 1),
+                helpText: 'SELECT SEMESTER START',
+              );
+              if (picked != null) setState(() => _semesterStart = picked);
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: _softFill(_wizardPrimary, light: 0.06, dark: 0.10),
+                borderRadius: BorderRadius.circular(14),
+                border:
+                    Border.all(color: _wizardPrimary.withValues(alpha: 0.25)),
+              ),
+              child: Row(children: [
+                Icon(Icons.calendar_today, size: 18, color: _primaryLabelColor),
+                const SizedBox(width: 8),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Start Date',
+                      style: TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.subtitleColor(context))),
+                  const SizedBox(height: 2),
+                  Text(
+                    _semesterStart != null
+                        ? AppTheme.formatDate(_semesterStart!)
+                        : 'Select',
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: _primaryLabelColor),
+                  ),
+                ]),
+              ]),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: InkWell(
+            onTap: () async {
+              final picked = await AppTheme.showAppDatePicker(
+                context,
+                initialDate: _semesterEnd ?? DateTime(2026, 12, 15),
+                helpText: 'SELECT SEMESTER END',
+              );
+              if (picked != null) setState(() => _semesterEnd = picked);
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: _softFill(_wizardPrimary, light: 0.06, dark: 0.10),
+                borderRadius: BorderRadius.circular(14),
+                border:
+                    Border.all(color: _wizardPrimary.withValues(alpha: 0.25)),
+              ),
+              child: Row(children: [
+                Icon(Icons.event, size: 18, color: _primaryLabelColor),
+                const SizedBox(width: 8),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('End Date',
+                      style: TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.subtitleColor(context))),
+                  const SizedBox(height: 2),
+                  Text(
+                    _semesterEnd != null
+                        ? AppTheme.formatDate(_semesterEnd!)
+                        : 'Select',
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: _primaryLabelColor),
+                  ),
+                ]),
+              ]),
+            ),
+          ),
+        ),
+      ]),
+      const SizedBox(height: 20),
+
+      // --- Slot Duration Picker ---
+      Text('Slot Duration',
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+              color: AppTheme.textColor(context))),
+      const SizedBox(height: 8),
+      Wrap(
+          spacing: 8,
+          children: [30, 45, 50, 60, 90]
+              .map((min) => ChoiceChip(
+                  label: Text('$min min'),
+                  selected: _slotDuration == min,
+                  onSelected: (_) {
+                    setState(() {
+                      _slotDuration = min;
+                      _regenerateDefaultSlotsWithDuration();
+                    });
+                  },
+                  selectedColor: _wizardPrimary,
+                  backgroundColor: _chipBackground,
+                  checkmarkColor: Colors.white,
+                  side: _chipSide(_slotDuration == min),
+                  labelStyle: _chipLabelStyle(_slotDuration == min)))
+              .toList()),
+      const SizedBox(height: 16),
+
       ..._timeSlots.asMap().entries.map((e) => _buildTimeSlotRow(e.key)),
       const SizedBox(height: 12),
       OutlinedButton.icon(
@@ -522,8 +662,32 @@ class _WizardScreenState extends State<WizardScreen> {
     ]);
   }
 
+  void _regenerateDefaultSlotsWithDuration() {
+    const startHour = 9;
+    _timeSlots = List.generate(_slotsPerDay, (i) {
+      final startMinutes = startHour * 60 + i * _slotDuration;
+      final endMinutes = startMinutes + _slotDuration;
+      final sh = startMinutes ~/ 60;
+      final sm = startMinutes % 60;
+      final eh = endMinutes ~/ 60;
+      final em = endMinutes % 60;
+      return TimeSlotDef(
+          startTime:
+              '${sh.toString().padLeft(2, '0')}:${sm.toString().padLeft(2, '0')}',
+          endTime:
+              '${eh.toString().padLeft(2, '0')}:${em.toString().padLeft(2, '0')}');
+    });
+  }
+
   Widget _buildTimeSlotRow(int index) {
     final slot = _timeSlots[index];
+    final startTod = AppTheme.parseTime(slot.startTime);
+    final endTod = AppTheme.parseTime(slot.endTime);
+    final startDisplay = startTod != null
+        ? AppTheme.formatTimeDisplay(startTod)
+        : slot.startTime;
+    final endDisplay =
+        endTod != null ? AppTheme.formatTimeDisplay(endTod) : slot.endTime;
     return Card(
         child: Padding(
             padding: const EdgeInsets.all(12),
@@ -557,10 +721,70 @@ class _WizardScreenState extends State<WizardScreen> {
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                               color: AppTheme.textColor(context))),
-                    Text('${slot.startTime} - ${slot.endTime}',
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.subtitleColor(context))),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Row(children: [
+                        // Tappable start time with clock icon
+                        InkWell(
+                          onTap: () => _pickSlotTime(index, isStart: true),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: _softFill(_wizardPrimary,
+                                    light: 0.06, dark: 0.10),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color:
+                                        _wizardPrimary.withValues(alpha: 0.2))),
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.access_time,
+                                  size: 14, color: _primaryLabelColor),
+                              const SizedBox(width: 4),
+                              Text(startDisplay,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: _primaryLabelColor)),
+                            ]),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Text('—',
+                              style: TextStyle(
+                                  color: AppTheme.subtitleColor(context))),
+                        ),
+                        // Tappable end time with clock icon
+                        InkWell(
+                          onTap: () => _pickSlotTime(index, isStart: false),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: _softFill(_wizardPrimary,
+                                    light: 0.06, dark: 0.10),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                    color:
+                                        _wizardPrimary.withValues(alpha: 0.2))),
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.access_time,
+                                  size: 14, color: _primaryLabelColor),
+                              const SizedBox(width: 4),
+                              Text(endDisplay,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: _primaryLabelColor)),
+                            ]),
+                          ),
+                        ),
+                      ]),
+                    ),
                   ])),
               IconButton(
                   icon: const Icon(Icons.edit, size: 18),
@@ -572,30 +796,115 @@ class _WizardScreenState extends State<WizardScreen> {
             ])));
   }
 
+  /// Opens a clock picker for a specific time slot's start or end time.
+  Future<void> _pickSlotTime(int index, {required bool isStart}) async {
+    final slot = _timeSlots[index];
+    final currentStr = isStart ? slot.startTime : slot.endTime;
+    final current = AppTheme.parseTime(currentStr) ?? TimeOfDay.now();
+    final picked = await AppTheme.showAppTimePicker(
+      context,
+      initialTime: current,
+      helpText: isStart ? 'SELECT START TIME' : 'SELECT END TIME',
+    );
+    if (picked != null && mounted) {
+      setState(() {
+        final formatted = AppTheme.formatTime(picked);
+        if (isStart) {
+          _timeSlots[index] = TimeSlotDef(
+              startTime: formatted,
+              endTime: slot.endTime,
+              isBreak: slot.isBreak,
+              breakName: slot.breakName);
+        } else {
+          _timeSlots[index] = TimeSlotDef(
+              startTime: slot.startTime,
+              endTime: formatted,
+              isBreak: slot.isBreak,
+              breakName: slot.breakName);
+        }
+      });
+    }
+  }
+
   void _editTimeSlot(int index) {
     final slot = _timeSlots[index];
-    final startCtrl = TextEditingController(text: slot.startTime);
-    final endCtrl = TextEditingController(text: slot.endTime);
     final nameCtrl = TextEditingController(text: slot.breakName);
     bool isBreak = slot.isBreak;
+    String startTime = slot.startTime;
+    String endTime = slot.endTime;
 
     showDialog(
         context: context,
         builder: (ctx) => StatefulBuilder(
             builder: (ctx, setDlg) => AlertDialog(
                   title: const Text('Edit Time Slot'),
-                  content: Column(mainAxisSize: MainAxisSize.min, children: [
-                    TextField(
-                        controller: startCtrl,
-                        decoration: const InputDecoration(
-                            labelText: 'Start Time', hintText: '09:00')),
-                    const SizedBox(height: 12),
-                    TextField(
-                        controller: endCtrl,
-                        decoration: const InputDecoration(
-                            labelText: 'End Time', hintText: '09:50')),
+                  content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    // Start time clock picker
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color:
+                              _softFill(_wizardPrimary, light: 0.1, dark: 0.16),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.access_time,
+                            color: _primaryLabelColor, size: 20),
+                      ),
+                      title: const Text('Start Time',
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w600)),
+                      subtitle: Text(startTime,
+                          style: TextStyle(
+                              color: _primaryLabelColor,
+                              fontWeight: FontWeight.bold)),
+                      trailing: const Icon(Icons.edit, size: 16),
+                      onTap: () async {
+                        final tod =
+                            AppTheme.parseTime(startTime) ?? TimeOfDay.now();
+                        final picked = await AppTheme.showAppTimePicker(ctx,
+                            initialTime: tod, helpText: 'SELECT START TIME');
+                        if (picked != null) {
+                          setDlg(() => startTime = AppTheme.formatTime(picked));
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    // End time clock picker
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color:
+                              _softFill(_wizardPrimary, light: 0.1, dark: 0.16),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.access_time,
+                            color: _primaryLabelColor, size: 20),
+                      ),
+                      title: const Text('End Time',
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w600)),
+                      subtitle: Text(endTime,
+                          style: TextStyle(
+                              color: _primaryLabelColor,
+                              fontWeight: FontWeight.bold)),
+                      trailing: const Icon(Icons.edit, size: 16),
+                      onTap: () async {
+                        final tod =
+                            AppTheme.parseTime(endTime) ?? TimeOfDay.now();
+                        final picked = await AppTheme.showAppTimePicker(ctx,
+                            initialTime: tod, helpText: 'SELECT END TIME');
+                        if (picked != null) {
+                          setDlg(() => endTime = AppTheme.formatTime(picked));
+                        }
+                      },
+                    ),
                     const SizedBox(height: 12),
                     SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
                         title: const Text('Is Break/Recess'),
                         value: isBreak,
                         onChanged: (v) => setDlg(() => isBreak = v)),
@@ -605,7 +914,7 @@ class _WizardScreenState extends State<WizardScreen> {
                           decoration: const InputDecoration(
                               labelText: 'Break Name',
                               hintText: 'Lunch Break')),
-                  ]),
+                  ])),
                   actions: [
                     TextButton(
                         onPressed: () => Navigator.pop(ctx),
@@ -614,8 +923,8 @@ class _WizardScreenState extends State<WizardScreen> {
                         onPressed: () {
                           setState(() {
                             _timeSlots[index] = TimeSlotDef(
-                                startTime: startCtrl.text,
-                                endTime: endCtrl.text,
+                                startTime: startTime,
+                                endTime: endTime,
                                 isBreak: isBreak,
                                 breakName: nameCtrl.text);
                           });
@@ -730,7 +1039,8 @@ class _WizardScreenState extends State<WizardScreen> {
               Expanded(
                 child: Text(
                   'No subjects found. Go to Manage Subjects in the Admin Dashboard to add subjects first.',
-                  style: TextStyle(fontSize: 12, color: AppTheme.subtitleColor(context)),
+                  style: TextStyle(
+                      fontSize: 12, color: AppTheme.subtitleColor(context)),
                 ),
               ),
             ],
@@ -1002,8 +1312,6 @@ class _WizardScreenState extends State<WizardScreen> {
       // Custom room addition removed per user request
     ]);
   }
-
-
 
   // Step 4: Faculty Availability
   Widget _buildStep4() {

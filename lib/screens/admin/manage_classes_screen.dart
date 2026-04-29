@@ -19,8 +19,10 @@ class _ManageClassesScreenState extends State<ManageClassesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Classes & Semesters')),
+    return CampusScaffold(
+      title: 'Classes & Semesters',
+      subtitle: 'Build class groups that students and timetables can target.',
+      icon: Icons.class_rounded,
       body: StreamBuilder<List<ClassModel>>(
         stream: _supabaseService.getClasses(),
         builder: (context, snapshot) {
@@ -45,10 +47,11 @@ class _ManageClassesScreenState extends State<ManageClassesScreen> {
               final c = classes[i];
               return ThemedListCard(
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: CircleAvatar(
-                    backgroundColor: AppTheme.success.withValues(alpha: 
-                        AppTheme.isDark(context) ? 0.2 : 0.15),
+                    backgroundColor: AppTheme.success.withValues(
+                        alpha: AppTheme.isDark(context) ? 0.2 : 0.15),
                     child: const Icon(Icons.class_, color: AppTheme.success),
                   ),
                   title: Text(
@@ -125,7 +128,8 @@ class _ManageClassesScreenState extends State<ManageClassesScreen> {
               } catch (e) {
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (mounted) {
-                  showAppSnackBar(context, 'Failed to delete: $e', isError: true);
+                  showAppSnackBar(context, 'Failed to delete: $e',
+                      isError: true);
                 }
               }
             },
@@ -208,7 +212,8 @@ class _ClassDialogState extends State<_ClassDialog> {
               decoration: const InputDecoration(labelText: 'Department'),
               initialValue: _selectedDeptId,
               items: _departments
-                  .map((d) => DropdownMenuItem(value: d.id, child: Text(d.name)))
+                  .map(
+                      (d) => DropdownMenuItem(value: d.id, child: Text(d.name)))
                   .toList(),
               onChanged: (val) {
                 setState(() {
@@ -258,7 +263,8 @@ class _ClassDialogState extends State<_ClassDialog> {
                       _semCtrl.text.trim().isEmpty ||
                       _selectedDeptId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please fill required fields')),
+                      const SnackBar(
+                          content: Text('Please fill required fields')),
                     );
                     return;
                   }
@@ -304,4 +310,3 @@ class _ClassDialogState extends State<_ClassDialog> {
     );
   }
 }
-

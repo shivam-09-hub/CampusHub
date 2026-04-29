@@ -37,8 +37,10 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Notes')),
+    return CampusScaffold(
+      title: 'Manage Notes',
+      subtitle: 'Upload study materials, PDFs, images, and documents.',
+      icon: Icons.note_alt_rounded,
       body: LoadingOverlay(
         isLoading: _uploading,
         message: 'Uploading file...',
@@ -106,7 +108,8 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: fileColor.withValues(alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
+            color: fileColor.withValues(
+                alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(fileIcon, color: fileColor, size: 24),
@@ -124,7 +127,8 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
             const SizedBox(height: 4),
             Text(
               '${note.fileTypeLabel} - ${note.department.isEmpty ? 'General' : note.department} - ${note.className.isEmpty ? 'All classes' : note.className}',
-              style: TextStyle(fontSize: 13, color: AppTheme.subtitleColor(context)),
+              style: TextStyle(
+                  fontSize: 13, color: AppTheme.subtitleColor(context)),
             ),
             if (note.description.isNotEmpty) ...[
               const SizedBox(height: 2),
@@ -132,7 +136,8 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
                 note.description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12, color: AppTheme.subtitleColor(context)),
+                style: TextStyle(
+                    fontSize: 12, color: AppTheme.subtitleColor(context)),
               ),
             ],
             const SizedBox(height: 2),
@@ -143,7 +148,8 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
             const SizedBox(height: 2),
             Text(
               date,
-              style: TextStyle(fontSize: 11, color: AppTheme.subtitleColor(context)),
+              style: TextStyle(
+                  fontSize: 11, color: AppTheme.subtitleColor(context)),
             ),
           ],
         ),
@@ -312,11 +318,13 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
             ElevatedButton(
               onPressed: () async {
                 if (selectedFilePath == null || selectedFileName == null) {
-                  showAppSnackBar(context, 'Please select a file first', isError: true);
+                  showAppSnackBar(context, 'Please select a file first',
+                      isError: true);
                   return;
                 }
                 if (titleCtrl.text.trim().isEmpty) {
-                  showAppSnackBar(context, 'Please fill all required fields', isError: true);
+                  showAppSnackBar(context, 'Please fill all required fields',
+                      isError: true);
                   return;
                 }
                 Navigator.pop(ctx);
@@ -366,11 +374,16 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
       );
 
       _refreshNotes();
-      if (mounted) showAppSnackBar(context, 'Note uploaded successfully');
+      if (mounted) {
+        showAppSnackBar(context, 'Note uploaded successfully');
+      }
     } catch (e, st) {
       debugPrint('Supabase note upload failed: $e');
       debugPrint('$st');
-      if (mounted) showAppSnackBar(context, 'Upload failed. Please try again', isError: true);
+      if (mounted) {
+        showAppSnackBar(context, 'Upload failed. Please try again',
+            isError: true);
+      }
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -402,7 +415,8 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
                 debugPrint('$st');
                 if (mounted) {
                   Navigator.pop(ctx);
-                  showAppSnackBar(context, 'Delete failed. Please try again', isError: true);
+                  showAppSnackBar(context, 'Delete failed. Please try again',
+                      isError: true);
                 }
               }
             },
@@ -413,4 +427,3 @@ class _ManageNotesScreenState extends State<ManageNotesScreen> {
     );
   }
 }
-

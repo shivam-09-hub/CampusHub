@@ -34,8 +34,10 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Notices')),
+    return CampusScaffold(
+      title: 'Manage Notices',
+      subtitle: 'Publish announcements to all students or departments.',
+      icon: Icons.campaign_rounded,
       body: StreamBuilder<List<NoticeModel>>(
         stream: _supabaseService.getNotices(),
         builder: (context, snapshot) {
@@ -82,12 +84,12 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 
-                        AppTheme.isDark(context) ? 0.2 : 0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    color: AppTheme.accent.withValues(
+                        alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.campaign_rounded,
-                      color: Color(0xFFF59E0B), size: 20),
+                  child: Icon(Icons.campaign_rounded,
+                      color: AppTheme.accent, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -120,7 +122,8 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
             Row(
               children: [
                 ThemedChip(
-                  text: 'To: ${notice.targetAudience == 'all' ? 'All Students' : notice.targetAudience}',
+                  text:
+                      'To: ${notice.targetAudience == 'all' ? 'All Students' : notice.targetAudience}',
                   color: AppTheme.primary,
                 ),
                 const Spacer(),
@@ -178,8 +181,8 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
                   items: [
                     const DropdownMenuItem(
                         value: 'all', child: Text('All Students')),
-                    ..._departments.map(
-                        (d) => DropdownMenuItem(value: d.name, child: Text(d.name))),
+                    ..._departments.map((d) =>
+                        DropdownMenuItem(value: d.name, child: Text(d.name))),
                   ],
                   onChanged: (v) => setDlg(() => audience = v!),
                 ),
@@ -194,7 +197,8 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
               onPressed: () async {
                 if (titleCtrl.text.trim().isEmpty ||
                     descCtrl.text.trim().isEmpty) {
-                  showAppSnackBar(context, 'Please fill all fields', isError: true);
+                  showAppSnackBar(context, 'Please fill all fields',
+                      isError: true);
                   return;
                 }
                 final notice = NoticeModel(
@@ -242,4 +246,3 @@ class _ManageNoticesScreenState extends State<ManageNoticesScreen> {
     );
   }
 }
-

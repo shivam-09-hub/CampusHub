@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import '../../../models/models.dart';
 import '../../../models/user_model.dart';
 import '../../../config/app_theme.dart';
@@ -35,6 +36,10 @@ class _ResultScreenState extends State<ResultScreen>
   List<ConflictResult> _conflicts = [];
   bool _exporting = false;
   bool _checkingMove = false;
+  int _selectedDay = 0;
+  DateTime _weekStartDate = DateTime.now();
+  TimeOfDay? _filterStartTime;
+  TimeOfDay? _filterEndTime;
 
   @override
   void initState() {
@@ -46,6 +51,9 @@ class _ResultScreenState extends State<ResultScreen>
         e.slot < _project.timeSlots.length &&
         _project.timeSlots[e.slot].isBreak);
     _tabCtrl = TabController(length: 2, vsync: this);
+    // Initialize week start to the nearest Monday
+    final now = DateTime.now();
+    _weekStartDate = now.subtract(Duration(days: now.weekday - 1));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showMessages(widget.messages);
       _refreshConflictContext();
@@ -545,15 +553,254 @@ class _ResultScreenState extends State<ResultScreen>
           Tab(icon: Icon(Icons.grid_on), text: 'Grid View')
         ]),
       ),
-      body: Column(children: [
-        _buildConflictBanner(),
+      body: Container(
+        decoration: BoxDecoration(gradient: AppTheme.screenGradient(context)),
+        child: Column(children: [
+          _buildConflictBanner(),
+          _buildWeekNavBar(),
+          _buildDayTabs(),
+          if (_filterStartTime != null || _filterEndTime != null)
+            _buildTimeFilterChip(),
+          Expanded(
+              child: TabBarView(
+                  controller: _tabCtrl,
+                  children: [_buildDayView(), _buildGridView()])),
+          _buildBottomBar(),
+        ]),
+      ),
+    );
+  }
+
+  // ── Week Navigation Bar ────────────────────────────────────────────────────
+  Widget _buildWeekNavBar() {
+    final isDark = AppTheme.isDark(context);
+    final weekEnd = _weekStartDate.add(const Duration(days: 6));
+    final startStr = DateFormat('MMM d').format(_weekStartDate);
+    final endStr = DateFormat('MMM d, yyyy').format(weekEnd);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1D35) : Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? const Color(0xFF343958) : AppTheme.lightGrey,
+          ),
+        ),
+      ),
+      child: Row(children: [
+        IconButton(
+          icon: const Icon(Icons.chevron_left, size: 22),
+          onPressed: () => setState(() {
+            _weekStartDate = _weekStartDate.subtract(const Duration(days: 7));
+          }),
+          tooltip: 'Previous week',
+        ),
         Expanded(
-            child: TabBarView(
-                controller: _tabCtrl,
-                children: [_buildDayView(), _buildGridView()])),
-        _buildBottomBar(),
+          child: InkWell(
+            onTap: () async {
+              final picked = await AppTheme.showAppDatePicker(
+                context,
+                initialDate: _weekStartDate,
+                helpText: 'SELECT WEEK',
+              );
+              if (picked != null) {
+                setState(() {
+                  _weekStartDate =
+                      picked.subtract(Duration(days: picked.weekday - 1));
+                });
+              }
+            },
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppTheme.primary.withValues(alpha: 0.1)
+                    : AppTheme.primary.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.calendar_today,
+                      size: 16,
+                      color:
+                          isDark ? const Color(0xFF8B84FF) : AppTheme.primary),
+                  const SizedBox(width: 8),
+                  Text('$startStr — $endStr',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? const Color(0xFFC7C3FF)
+                              : AppTheme.primary)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.chevron_right, size: 22),
+          onPressed: () => setState(() {
+            _weekStartDate = _weekStartDate.add(const Duration(days: 7));
+          }),
+          tooltip: 'Next week',
+        ),
+        // Time range filter
+        IconButton(
+          icon: Icon(
+            Icons.filter_alt_outlined,
+            size: 20,
+            color: (_filterStartTime != null || _filterEndTime != null)
+                ? AppTheme.success
+                : null,
+          ),
+          onPressed: _showTimeRangeFilter,
+          tooltip: 'Filter by time',
+        ),
       ]),
     );
+  }
+
+  // ── Day Tabs ───────────────────────────────────────────────────────────────
+  Widget _buildDayTabs() {
+    final isDark = AppTheme.isDark(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(_project.workingDays, (i) {
+            final isSelected = _selectedDay == i;
+            final dayName = AppConst.dayLabel(i).substring(0, 3);
+            final entriesForDay = _entries.where((e) => e.day == i).length;
+            return Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: InkWell(
+                onTap: () => setState(() => _selectedDay = i),
+                borderRadius: BorderRadius.circular(12),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    gradient: isSelected ? AppTheme.primaryGradient : null,
+                    color: isSelected
+                        ? null
+                        : (isDark
+                            ? const Color(0xFF20243E)
+                            : Colors.grey.shade100),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                                color: AppTheme.primary.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2))
+                          ]
+                        : [],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(dayName,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppTheme.subtitleColor(context))),
+                      const SizedBox(height: 2),
+                      Text('$entriesForDay',
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: isSelected
+                                  ? Colors.white70
+                                  : AppTheme.subtitleColor(context))),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  // ── Time Range Filter ──────────────────────────────────────────────────────
+  Widget _buildTimeFilterChip() {
+    final startStr = _filterStartTime != null
+        ? AppTheme.formatTimeDisplay(_filterStartTime!)
+        : '';
+    final endStr = _filterEndTime != null
+        ? AppTheme.formatTimeDisplay(_filterEndTime!)
+        : '';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: AppTheme.success.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppTheme.success.withValues(alpha: 0.3)),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.access_time, size: 14, color: AppTheme.success),
+            const SizedBox(width: 6),
+            Text(
+              '$startStr — $endStr',
+              style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.success),
+            ),
+          ]),
+        ),
+        const SizedBox(width: 8),
+        InkWell(
+          onTap: () => setState(() {
+            _filterStartTime = null;
+            _filterEndTime = null;
+          }),
+          child: const Icon(Icons.close, size: 16, color: AppTheme.error),
+        ),
+      ]),
+    );
+  }
+
+  void _showTimeRangeFilter() async {
+    final start = await AppTheme.showAppTimePicker(
+      context,
+      initialTime: _filterStartTime ?? const TimeOfDay(hour: 9, minute: 0),
+      helpText: 'FILTER FROM',
+    );
+    if (start == null || !mounted) return;
+    final end = await AppTheme.showAppTimePicker(
+      context,
+      initialTime: _filterEndTime ?? const TimeOfDay(hour: 17, minute: 0),
+      helpText: 'FILTER TO',
+    );
+    if (end == null || !mounted) return;
+    setState(() {
+      _filterStartTime = start;
+      _filterEndTime = end;
+    });
+  }
+
+  bool _isEntryInTimeRange(TimetableEntry entry) {
+    if (_filterStartTime == null && _filterEndTime == null) return true;
+    final entryStart = AppTheme.parseTime(entry.startTime);
+    final entryEnd = AppTheme.parseTime(entry.endTime);
+    if (entryStart == null || entryEnd == null) return true;
+    final startMinutes =
+        (_filterStartTime?.hour ?? 0) * 60 + (_filterStartTime?.minute ?? 0);
+    final endMinutes =
+        (_filterEndTime?.hour ?? 23) * 60 + (_filterEndTime?.minute ?? 59);
+    final entryStartMin = entryStart.hour * 60 + entryStart.minute;
+    final entryEndMin = entryEnd.hour * 60 + entryEnd.minute;
+    return entryStartMin >= startMinutes && entryEndMin <= endMinutes;
   }
 
   // ── Day View ───────────────────────────────────────────────────────────────
@@ -613,46 +860,42 @@ class _ResultScreenState extends State<ResultScreen>
           child:
               Text('No entries', style: TextStyle(color: AppTheme.greyText)));
     }
-    return ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: _project.workingDays,
-        itemBuilder: (_, day) {
-          final dayEntries = _entries.where((e) => e.day == day).toList()
-            ..sort((a, b) => a.slot.compareTo(b.slot));
-          return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Row(children: [
-                      Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                              gradient: AppTheme.primaryGradient,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Text(AppConst.dayLabel(day),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14))),
-                      const SizedBox(width: 8),
-                      Text('${dayEntries.length} classes',
-                          style: const TextStyle(
-                              color: AppTheme.greyText, fontSize: 13)),
-                    ])),
-                ...List.generate(_project.slotsPerDay, (slot) {
-                  // Break slot — distinct card
-                  if (_isBreakSlot(slot)) {
-                    return _breakCard(slot);
-                  }
-                  final entry =
-                      dayEntries.where((e) => e.slot == slot).firstOrNull;
-                  return _dayCard(slot, entry);
-                }),
-                const SizedBox(height: 8),
-              ]);
-        });
+    // Show only the selected day
+    final day = _selectedDay;
+    final dayEntries = _entries.where((e) => e.day == day).toList()
+      ..sort((a, b) => a.slot.compareTo(b.slot));
+    return ListView(padding: const EdgeInsets.all(16), children: [
+      Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(children: [
+            Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                    gradient: AppTheme.primaryGradient,
+                    borderRadius: BorderRadius.circular(20)),
+                child: Text(AppConst.dayLabel(day),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14))),
+            const SizedBox(width: 8),
+            Text('${dayEntries.length} classes',
+                style: const TextStyle(color: AppTheme.greyText, fontSize: 13)),
+          ])),
+      ...List.generate(_project.slotsPerDay, (slot) {
+        if (_isBreakSlot(slot)) {
+          return _breakCard(slot);
+        }
+        final entry = dayEntries.where((e) => e.slot == slot).firstOrNull;
+        // Apply time range filter
+        if (entry != null && !_isEntryInTimeRange(entry)) {
+          return const SizedBox.shrink();
+        }
+        return _dayCard(slot, entry);
+      }),
+      const SizedBox(height: 8),
+    ]);
   }
 
   /// Distinctive break/recess card with amber/orange theme
@@ -933,8 +1176,9 @@ class _ResultScreenState extends State<ResultScreen>
                   ? Icons.warning_amber_rounded
                   : Icons.drag_indicator,
               size: 10,
-              color:
-                  entry.hasConflict ? AppTheme.error : accent.withValues(alpha: 0.5)),
+              color: entry.hasConflict
+                  ? AppTheme.error
+                  : accent.withValues(alpha: 0.5)),
           Text(entry.subjectName,
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -987,14 +1231,25 @@ class _ResultScreenState extends State<ResultScreen>
 
   // ── Bottom Bar ─────────────────────────────────────────────────────────────
   Widget _buildBottomBar() {
+    final isDark = AppTheme.isDark(context);
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [
-        BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -4))
-      ]),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1D35) : Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? const Color(0xFF343958) : AppTheme.lightGrey,
+          ),
+        ),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4))
+              ],
+      ),
       child: Row(children: [
         Expanded(
             child: OutlinedButton.icon(
@@ -1032,4 +1287,3 @@ class _DragData {
   final int slot;
   const _DragData(this.day, this.slot);
 }
-

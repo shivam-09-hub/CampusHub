@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../config/app_theme.dart';
@@ -112,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (detail.contains('email')) msg = 'Invalid email address.';
       _showSnack(msg, isError: true);
     } catch (e) {
-      print('Login error: $e');
+      debugPrint('Login error: $e');
       _showSnack('Something went wrong. $e', isError: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -156,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (detail.contains('email')) msg = 'Invalid email address.';
       _showSnack(msg, isError: true);
     } catch (e) {
-      print('Signup error: $e');
+      debugPrint('Signup error: $e');
       _showSnack('Something went wrong: $e', isError: true);
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -240,35 +241,94 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppTheme.isDark(context);
     return Scaffold(
-      body: LoadingOverlay(
-        isLoading: _isLoading,
-        message: _authMode == 'signup'
-            ? 'Creating admin account...'
-            : 'Signing in...',
-        child: SafeArea(
-          child: FadeTransition(
-            opacity: _fadeAnim,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-                  _buildRoleSelector(),
-                  const SizedBox(height: 28),
-                  if (_authMode == 'signup')
-                    _buildSignUpForm()
-                  else
-                    _buildLoginForm(),
-                  const SizedBox(height: 24),
-                ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration:
+                BoxDecoration(gradient: AppTheme.screenGradient(context)),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.primary.withValues(alpha: isDark ? 0.18 : 0.10),
+                    Colors.transparent,
+                    AppTheme.secondary.withValues(alpha: isDark ? 0.14 : 0.08),
+                  ],
+                  stops: const [0, 0.52, 1],
+                ),
               ),
             ),
           ),
-        ),
+          LoadingOverlay(
+            isLoading: _isLoading,
+            message: _authMode == 'signup'
+                ? 'Creating admin account...'
+                : 'Signing in...',
+            child: SafeArea(
+              child: FadeTransition(
+                opacity: _fadeAnim,
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 24),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 520),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(28),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                          child: Container(
+                            padding: const EdgeInsets.all(32),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : Colors.white.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.white.withValues(alpha: 0.5),
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildHeader(),
+                                const SizedBox(height: 32),
+                                _buildRoleSelector(),
+                                const SizedBox(height: 28),
+                                if (_authMode == 'signup')
+                                  _buildSignUpForm()
+                                else
+                                  _buildLoginForm(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -312,19 +372,6 @@ class _LoginScreenState extends State<LoginScreen>
       ),
       child: Stack(
         children: [
-          // Decorative circle
-          Positioned(
-            top: -20,
-            right: -20,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.08),
-              ),
-            ),
-          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -381,8 +428,8 @@ class _LoginScreenState extends State<LoginScreen>
         Row(
           children: [
             Expanded(
-              child: _roleCard(
-                  'admin', 'Admin / Faculty', Icons.admin_panel_settings_rounded),
+              child: _roleCard('admin', 'Admin / Faculty',
+                  Icons.admin_panel_settings_rounded),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -414,9 +461,8 @@ class _LoginScreenState extends State<LoginScreen>
               : AppTheme.cardColor(context),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected
-                ? AppTheme.primary
-                : AppTheme.borderColor(context),
+            color:
+                isSelected ? AppTheme.primary : AppTheme.borderColor(context),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected ? AppTheme.cardShadow : null,
@@ -448,9 +494,8 @@ class _LoginScreenState extends State<LoginScreen>
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: isSelected
-                    ? AppTheme.primary
-                    : AppTheme.textColor(context),
+                color:
+                    isSelected ? AppTheme.primary : AppTheme.textColor(context),
               ),
             ),
           ],
@@ -620,12 +665,7 @@ class _LoginScreenState extends State<LoginScreen>
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor(context),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: AppTheme.adaptiveShadow(context),
-        border: AppTheme.isDark(context)
-            ? Border.all(color: AppTheme.borderColor(context))
-            : null,
+        color: Colors.transparent, // Let glassmorphism handle background
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -633,15 +673,15 @@ class _LoginScreenState extends State<LoginScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 
-                  AppTheme.isDark(context) ? 0.2 : 0.1),
+              color: AppTheme.primary
+                  .withValues(alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              '🔐 Admin Registration',
+              'Admin Registration',
               style: TextStyle(
                   color: AppTheme.isDark(context)
-                      ? const Color(0xFFA5B4FC)
+                      ? AppTheme.primaryLight
                       : AppTheme.primary,
                   fontWeight: FontWeight.w700,
                   fontSize: 13),
@@ -659,8 +699,8 @@ class _LoginScreenState extends State<LoginScreen>
           const SizedBox(height: 6),
           Text(
             'Register as a new admin / faculty member.',
-            style: TextStyle(
-                color: AppTheme.subtitleColor(context), fontSize: 14),
+            style:
+                TextStyle(color: AppTheme.subtitleColor(context), fontSize: 14),
           ),
           const SizedBox(height: 24),
 
@@ -758,4 +798,3 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 }
-

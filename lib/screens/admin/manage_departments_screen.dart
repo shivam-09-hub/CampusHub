@@ -11,7 +11,8 @@ class ManageDepartmentsScreen extends StatefulWidget {
   const ManageDepartmentsScreen({super.key, required this.user});
 
   @override
-  State<ManageDepartmentsScreen> createState() => _ManageDepartmentsScreenState();
+  State<ManageDepartmentsScreen> createState() =>
+      _ManageDepartmentsScreenState();
 }
 
 class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
@@ -19,8 +20,10 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Departments')),
+    return CampusScaffold(
+      title: 'Manage Departments',
+      subtitle: 'Organize programs used by classes, faculty, and students.',
+      icon: Icons.domain_rounded,
       body: StreamBuilder<List<DepartmentModel>>(
         stream: _supabaseService.getDepartments(),
         builder: (context, snapshot) {
@@ -32,7 +35,8 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
             return EmptyStateWidget(
               icon: Icons.domain,
               title: 'No Departments',
-              subtitle: 'Add departments to start managing classes and faculty.',
+              subtitle:
+                  'Add departments to start managing classes and faculty.',
               actionLabel: 'Add Department',
               onAction: () => _showDeptDialog(),
             );
@@ -45,15 +49,17 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
               final d = depts[i];
               return ThemedListCard(
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withValues(alpha: 
-                          AppTheme.isDark(context) ? 0.2 : 0.1),
+                      color: AppTheme.primary.withValues(
+                          alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.domain, color: AppTheme.primary, size: 22),
+                    child: const Icon(Icons.domain,
+                        color: AppTheme.primary, size: 22),
                   ),
                   title: Text(d.name,
                       style: TextStyle(
@@ -66,11 +72,13 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined, color: AppTheme.primary),
+                        icon: const Icon(Icons.edit_outlined,
+                            color: AppTheme.primary),
                         onPressed: () => _showDeptDialog(dept: d),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: AppTheme.error),
+                        icon: const Icon(Icons.delete_outline,
+                            color: AppTheme.error),
                         onPressed: () => _confirmDelete(d),
                       ),
                     ],
@@ -96,12 +104,16 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(dept == null ? 'Add Department' : 'Edit Department'),
-        content: TextField(
-          controller: nameCtrl,
-          decoration: const InputDecoration(labelText: 'Department Name', hintText: 'e.g. Computer Science'),
+        content: SingleChildScrollView(
+          child: TextField(
+            controller: nameCtrl,
+            decoration: const InputDecoration(
+                labelText: 'Department Name', hintText: 'e.g. Computer Science'),
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
               if (nameCtrl.text.trim().isEmpty) return;
@@ -137,9 +149,11 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete Department'),
-        content: Text('Are you sure you want to delete ${dept.name}? Make sure no classes are using it.'),
+        content: Text(
+            'Are you sure you want to delete ${dept.name}? Make sure no classes are using it.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
             onPressed: () async {
@@ -153,7 +167,8 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
               } catch (e) {
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (mounted) {
-                  showAppSnackBar(context, 'Failed to delete: $e', isError: true);
+                  showAppSnackBar(context, 'Failed to delete: $e',
+                      isError: true);
                 }
               }
             },
@@ -164,4 +179,3 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
     );
   }
 }
-

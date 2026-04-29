@@ -19,8 +19,10 @@ class _ManageMessagesScreenState extends State<ManageMessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Important Messages')),
+    return CampusScaffold(
+      title: 'Important Messages',
+      subtitle: 'Send priority updates that students can read instantly.',
+      icon: Icons.chat_bubble_rounded,
       body: StreamBuilder<List<MessageModel>>(
         stream: _supabaseService.getMessages(),
         builder: (context, snapshot) {
@@ -67,7 +69,7 @@ class _ManageMessagesScreenState extends State<ManageMessagesScreen> {
         priorityIcon = Icons.error_rounded;
         break;
       case 'important':
-        priorityColor = const Color(0xFFF59E0B);
+        priorityColor = AppTheme.accent;
         priorityLabel = 'IMPORTANT';
         priorityIcon = Icons.warning_rounded;
         break;
@@ -200,7 +202,8 @@ class _ManageMessagesScreenState extends State<ManageMessagesScreen> {
               onPressed: () async {
                 if (titleCtrl.text.trim().isEmpty ||
                     contentCtrl.text.trim().isEmpty) {
-                  showAppSnackBar(context, 'Please fill all fields', isError: true);
+                  showAppSnackBar(context, 'Please fill all fields',
+                      isError: true);
                   return;
                 }
                 final message = MessageModel(

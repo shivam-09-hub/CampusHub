@@ -275,7 +275,7 @@ class RoomCard extends StatelessWidget {
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: ListTile(
         leading: const CircleAvatar(
-          backgroundColor: Color(0xFF4A6CF7),
+          backgroundColor: AppColors.primary,
           child: Icon(Icons.meeting_room, color: Colors.white, size: 20),
         ),
         title: Text(room.roomId,

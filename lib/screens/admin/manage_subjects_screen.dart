@@ -21,8 +21,10 @@ class _ManageSubjectsScreenState extends State<ManageSubjectsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Subjects')),
+    return CampusScaffold(
+      title: 'Manage Subjects',
+      subtitle: 'Create curriculum entries and allocate faculty ownership.',
+      icon: Icons.menu_book_rounded,
       body: StreamBuilder<List<GlobalSubjectModel>>(
         stream: _supabaseService.getSubjects(),
         builder: (context, snapshot) {

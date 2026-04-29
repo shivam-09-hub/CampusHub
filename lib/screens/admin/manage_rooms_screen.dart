@@ -20,8 +20,10 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = AppTheme.isDark(context);
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Classrooms & Labs')),
+    return CampusScaffold(
+      title: 'Classrooms & Labs',
+      subtitle: 'Track rooms, labs, halls, and capacity for scheduling.',
+      icon: Icons.meeting_room_rounded,
       body: StreamBuilder<List<RoomModel>>(
         stream: _supabaseService.getRooms(),
         builder: (context, snapshot) {
@@ -40,9 +42,12 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
           }
 
           // Group by type
-          final classrooms = rooms.where((r) => r.roomType == 'Classroom').toList();
+          final classrooms =
+              rooms.where((r) => r.roomType == 'Classroom').toList();
           final labs = rooms.where((r) => r.roomType == 'Lab').toList();
-          final others = rooms.where((r) => r.roomType != 'Classroom' && r.roomType != 'Lab').toList();
+          final others = rooms
+              .where((r) => r.roomType != 'Classroom' && r.roomType != 'Lab')
+              .toList();
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -51,11 +56,17 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
               children: [
                 // Summary cards
                 Row(children: [
-                  Expanded(child: _summaryCard('Classrooms', classrooms.length, Icons.class_, AppTheme.primary, isDark)),
+                  Expanded(
+                      child: _summaryCard('Classrooms', classrooms.length,
+                          Icons.class_, AppTheme.primary, isDark)),
                   const SizedBox(width: 10),
-                  Expanded(child: _summaryCard('Labs', labs.length, Icons.science, AppTheme.warning, isDark)),
+                  Expanded(
+                      child: _summaryCard('Labs', labs.length, Icons.science,
+                          AppTheme.warning, isDark)),
                   const SizedBox(width: 10),
-                  Expanded(child: _summaryCard('Others', others.length, Icons.room, AppTheme.success, isDark)),
+                  Expanded(
+                      child: _summaryCard('Others', others.length, Icons.room,
+                          AppTheme.success, isDark)),
                 ]),
                 const SizedBox(height: 20),
                 ...rooms.map((r) => _buildRoomCard(r, isDark)),
@@ -72,7 +83,8 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
     );
   }
 
-  Widget _summaryCard(String label, int count, IconData icon, Color color, bool isDark) {
+  Widget _summaryCard(
+      String label, int count, IconData icon, Color color, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -83,19 +95,27 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
       child: Column(children: [
         Icon(icon, color: color, size: 24),
         const SizedBox(height: 4),
-        Text('$count', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-        Text(label, style: TextStyle(fontSize: 11, color: AppTheme.subtitleColor(context))),
+        Text('$count',
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+        Text(label,
+            style: TextStyle(
+                fontSize: 11, color: AppTheme.subtitleColor(context))),
       ]),
     );
   }
 
   Widget _buildRoomCard(RoomModel r, bool isDark) {
-    final typeColor = r.roomType == 'Lab' ? AppTheme.warning
-        : r.roomType == 'Seminar Hall' ? AppTheme.success
-        : AppTheme.primary;
-    final typeIcon = r.roomType == 'Lab' ? Icons.science
-        : r.roomType == 'Seminar Hall' ? Icons.groups
-        : Icons.meeting_room;
+    final typeColor = r.roomType == 'Lab'
+        ? AppTheme.warning
+        : r.roomType == 'Seminar Hall'
+            ? AppTheme.success
+            : AppTheme.primary;
+    final typeIcon = r.roomType == 'Lab'
+        ? Icons.science
+        : r.roomType == 'Seminar Hall'
+            ? Icons.groups
+            : Icons.meeting_room;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -111,12 +131,12 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
           backgroundColor: typeColor.withValues(alpha: isDark ? 0.2 : 0.12),
           child: Icon(typeIcon, color: typeColor, size: 22),
         ),
-        title: Text(r.roomId, 
+        title: Text(r.roomId,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textColor(context))),
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textColor(context))),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
           child: Wrap(
@@ -125,14 +145,19 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text('Capacity: ${r.capacity}',
-                  style: TextStyle(color: AppTheme.subtitleColor(context), fontSize: 13)),
+                  style: TextStyle(
+                      color: AppTheme.subtitleColor(context), fontSize: 13)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: typeColor.withValues(alpha: isDark ? 0.15 : 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(r.roomType, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: typeColor)),
+                child: Text(r.roomType,
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: typeColor)),
               ),
             ],
           ),
@@ -156,7 +181,8 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
 
   void _showRoomDialog({RoomModel? room}) {
     final nameCtrl = TextEditingController(text: room?.roomId ?? '');
-    final capCtrl = TextEditingController(text: room != null ? room.capacity.toString() : '40');
+    final capCtrl = TextEditingController(
+        text: room != null ? room.capacity.toString() : '40');
     String selectedType = room?.roomType ?? 'Classroom';
 
     showDialog(
@@ -189,28 +215,42 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('Room Type:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                const Text('Room Type:',
+                    style:
+                        TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                 const SizedBox(height: 8),
-                Wrap(spacing: 8, children: ['Classroom', 'Lab', 'Seminar Hall'].map((t) => ChoiceChip(
-                  label: Text(t),
-                  selected: selectedType == t,
-                  onSelected: (_) => setDlg(() => selectedType = t),
-                  selectedColor: AppTheme.primary,
-                  labelStyle: TextStyle(
-                    color: selectedType == t ? Colors.white : AppTheme.textColor(context),
-                    fontWeight: FontWeight.w600),
-                )).toList()),
+                Wrap(
+                    spacing: 8,
+                    children: ['Classroom', 'Lab', 'Seminar Hall']
+                        .map((t) => ChoiceChip(
+                              label: Text(t),
+                              selected: selectedType == t,
+                              onSelected: (_) => setDlg(() => selectedType = t),
+                              selectedColor: AppTheme.primary,
+                              labelStyle: TextStyle(
+                                  color: selectedType == t
+                                      ? Colors.white
+                                      : AppTheme.textColor(context),
+                                  fontWeight: FontWeight.w600),
+                            ))
+                        .toList()),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel')),
             ElevatedButton(
               onPressed: () async {
-                if (nameCtrl.text.trim().isEmpty || capCtrl.text.trim().isEmpty) return;
+                if (nameCtrl.text.trim().isEmpty ||
+                    capCtrl.text.trim().isEmpty) {
+                  return;
+                }
                 Navigator.pop(ctx);
                 final newRoom = RoomModel(
-                  id: room?.id ?? 'room_${DateTime.now().millisecondsSinceEpoch}',
+                  id: room?.id ??
+                      'room_${DateTime.now().millisecondsSinceEpoch}',
                   roomId: nameCtrl.text.trim(),
                   capacity: int.parse(capCtrl.text.trim()),
                   roomType: selectedType,
@@ -222,7 +262,8 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
                     // Room was saved but schema is missing room_type column — show amber warning
                     showAppSnackBar(context, warning, isError: true);
                   } else {
-                    showAppSnackBar(context, '${newRoom.roomType} saved successfully!');
+                    showAppSnackBar(
+                        context, '${newRoom.roomType} saved successfully!');
                   }
                 } catch (e) {
                   if (mounted) {
@@ -249,7 +290,8 @@ class _ManageRoomsScreenState extends State<ManageRoomsScreen> {
         title: const Text('Delete Room'),
         content: Text('Are you sure you want to delete ${room.roomId}?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
             onPressed: () async {

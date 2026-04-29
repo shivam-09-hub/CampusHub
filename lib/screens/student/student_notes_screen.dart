@@ -34,8 +34,10 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Notes & Materials')),
+    return CampusScaffold(
+      title: 'Notes & Materials',
+      subtitle: 'Study files shared for your class.',
+      icon: Icons.note_alt_rounded,
       body: FutureBuilder<List<NoteModel>>(
         future: _notesFuture,
         builder: (context, snapshot) {
@@ -49,8 +51,8 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48,
-                      color: AppTheme.error.withValues(alpha: 0.7)),
+                  Icon(Icons.error_outline,
+                      size: 48, color: AppTheme.error.withValues(alpha: 0.7)),
                   const SizedBox(height: 12),
                   Text('Failed to load notes',
                       style: TextStyle(color: AppTheme.textColor(context))),
@@ -67,10 +69,13 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
           final allNotes = snapshot.data ?? [];
           final notes = allNotes.where(_matchesStudent).toList();
 
-          debugPrint('StudentNotes: total=${allNotes.length}, filtered=${notes.length}');
-          debugPrint('StudentNotes: user dept="${widget.user.department}", semester="${widget.user.semester}"');
+          debugPrint(
+              'StudentNotes: total=${allNotes.length}, filtered=${notes.length}');
+          debugPrint(
+              'StudentNotes: user dept="${widget.user.department}", semester="${widget.user.semester}"');
           for (final n in allNotes) {
-            debugPrint('  Note: "${n.title}" dept="${n.department}" class="${n.className}" match=${_matchesStudent(n)}');
+            debugPrint(
+                '  Note: "${n.title}" dept="${n.department}" class="${n.className}" match=${_matchesStudent(n)}');
           }
 
           if (notes.isEmpty) {
@@ -82,7 +87,8 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
                   EmptyStateWidget(
                     icon: Icons.note_alt_outlined,
                     title: 'No Notes',
-                    subtitle: 'No study materials available for your class.\nPull down to refresh.',
+                    subtitle:
+                        'No study materials available for your class.\nPull down to refresh.',
                   ),
                 ],
               ),
@@ -147,7 +153,8 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: fileColor.withValues(alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
+            color: fileColor.withValues(
+                alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(fileIcon, color: fileColor, size: 24),
@@ -165,7 +172,8 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
             const SizedBox(height: 4),
             Text(
               '${note.fileTypeLabel} - ${note.department.isEmpty ? 'General' : note.department} - ${note.className.isEmpty ? 'All classes' : note.className}',
-              style: TextStyle(fontSize: 13, color: AppTheme.subtitleColor(context)),
+              style: TextStyle(
+                  fontSize: 13, color: AppTheme.subtitleColor(context)),
             ),
             if (note.description.isNotEmpty) ...[
               const SizedBox(height: 2),
@@ -173,13 +181,15 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
                 note.description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 12, color: AppTheme.subtitleColor(context)),
+                style: TextStyle(
+                    fontSize: 12, color: AppTheme.subtitleColor(context)),
               ),
             ],
             const SizedBox(height: 4),
             Text(
               date,
-              style: TextStyle(fontSize: 11, color: AppTheme.subtitleColor(context)),
+              style: TextStyle(
+                  fontSize: 11, color: AppTheme.subtitleColor(context)),
             ),
           ],
         ),
@@ -191,4 +201,3 @@ class _StudentNotesScreenState extends State<StudentNotesScreen> {
     );
   }
 }
-

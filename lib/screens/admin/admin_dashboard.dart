@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../config/app_theme.dart';
 import '../../models/user_model.dart';
@@ -83,7 +84,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: AppTheme.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.logout_rounded,
                   color: AppTheme.error, size: 20),
@@ -130,29 +131,33 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _loadStats,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Header ────────────────────────────────────────────────
-                _buildHeader(),
-                const SizedBox(height: 24),
+      body: Container(
+        decoration: BoxDecoration(gradient: AppTheme.screenGradient(context)),
+        child: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _loadStats,
+            color: AppTheme.primary,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Header ────────────────────────────────────────────────
+                  _buildHeader(),
+                  const SizedBox(height: 24),
 
-                // ── Quick Stats ───────────────────────────────────────────
-                const SectionTitle(title: 'Overview'),
-                _buildStatsRow(),
-                const SizedBox(height: 28),
+                  // ── Quick Stats ───────────────────────────────────────────
+                  const SectionTitle(title: 'Overview'),
+                  _buildStatsRow(),
+                  const SizedBox(height: 28),
 
-                // ── Features ──────────────────────────────────────────────
-                const SectionTitle(title: 'Manage'),
-                _buildFeatureGrid(),
-                const SizedBox(height: 24),
-              ],
+                  // ── Features ──────────────────────────────────────────────
+                  const SectionTitle(title: 'Manage'),
+                  _buildFeatureGrid(),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
           ),
         ),
@@ -161,59 +166,50 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Decorative circle
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.06),
-              ),
+    final isDark = AppTheme.isDark(context);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.20),
             ),
+            boxShadow:
+                AppTheme.glowShadow(AppTheme.primary, intensity: 0.25),
           ),
-          Row(
+          child: Row(
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hello, ${widget.user.name} 👋',
+                      'Hello, ${widget.user.name}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                          horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.12),
+                        ),
                       ),
                       child: const Text(
-                        '👑 Admin',
+                        '✦ Admin / Faculty',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -223,44 +219,47 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ],
                 ),
               ),
-              GestureDetector(
+              _headerButton(
                 onTap: _cycleTheme,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: AnimatedBuilder(
-                      animation: ThemeService(),
-                      builder: (context, _) {
-                        IconData icon = Icons.brightness_auto;
-                        if (ThemeService().themeMode == ThemeMode.light) {
-                          icon = Icons.light_mode;
-                        }
-                        if (ThemeService().themeMode == ThemeMode.dark) {
-                          icon = Icons.dark_mode;
-                        }
-                        return Icon(icon, color: Colors.white, size: 22);
-                      }),
-                ),
+                child: AnimatedBuilder(
+                    animation: ThemeService(),
+                    builder: (context, _) {
+                      IconData icon = Icons.brightness_auto;
+                      if (ThemeService().themeMode == ThemeMode.light) {
+                        icon = Icons.light_mode;
+                      }
+                      if (ThemeService().themeMode == ThemeMode.dark) {
+                        icon = Icons.dark_mode;
+                      }
+                      return Icon(icon, color: Colors.white, size: 22);
+                    }),
               ),
               const SizedBox(width: 10),
-              GestureDetector(
+              _headerButton(
                 onTap: _logout,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(Icons.logout_rounded,
-                      color: Colors.white, size: 22),
-                ),
+                child: const Icon(Icons.logout_rounded,
+                    color: Colors.white, size: 22),
               ),
             ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _headerButton({required VoidCallback onTap, required Widget child}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.12),
+          ),
+        ),
+        child: child,
       ),
     );
   }
@@ -268,7 +267,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget _buildStatsRow() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Responsive: use wrap for very narrow screens
         if (constraints.maxWidth < 340) {
           return Wrap(
             spacing: 10,
@@ -369,7 +367,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Notices',
         'Post announcements',
         Icons.campaign_rounded,
-        const Color(0xFFF59E0B),
+        AppTheme.accent,
         '$_noticeCount',
         () => Navigator.push(
                 context,
@@ -381,7 +379,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Notes',
         'Upload study materials',
         Icons.note_alt_rounded,
-        const Color(0xFF10B981),
+        AppTheme.success,
         null,
         () => Navigator.push(
                 context,
@@ -393,7 +391,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Messages',
         'Send important updates',
         Icons.message_rounded,
-        const Color(0xFFEF4444),
+        AppTheme.rose,
         '$_messageCount',
         () => Navigator.push(
                 context,
@@ -405,7 +403,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Departments',
         'Manage departments',
         Icons.domain_rounded,
-        Colors.indigo,
+        const Color(0xFF5B6CF7),
         '$_departmentCount',
         () => Navigator.push(
                 context,
@@ -417,7 +415,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Classes',
         'Manage semesters & sections',
         Icons.class_rounded,
-        Colors.teal,
+        AppTheme.secondary,
         '$_classCount',
         () => Navigator.push(
                 context,
@@ -429,7 +427,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Faculty',
         'Manage teachers',
         Icons.person_rounded,
-        Colors.blue,
+        const Color(0xFF6366F1),
         '$_facultyCount',
         () => Navigator.push(
                 context,
@@ -441,7 +439,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Subjects',
         'Manage curriculum',
         Icons.menu_book_rounded,
-        Colors.deepOrange,
+        const Color(0xFFE76F51),
         '$_subjectCount',
         () => Navigator.push(
                 context,
@@ -453,7 +451,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'Classrooms',
         'Manage rooms & capacity',
         Icons.meeting_room_rounded,
-        Colors.brown,
+        const Color(0xFF8D6E63),
         '$_roomCount',
         () => Navigator.push(
                 context,
@@ -465,7 +463,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'New Timetable',
         'Create from scratch',
         Icons.add_circle_rounded,
-        const Color(0xFF06B6D4),
+        AppTheme.secondary,
         null,
         () => Navigator.push(
                 context,
@@ -478,7 +476,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Responsive: 2 columns normally, 1 column on very narrow screens
         final crossAxisCount = constraints.maxWidth < 300 ? 1 : 2;
         final aspectRatio = constraints.maxWidth < 300 ? 2.0 : 1.1;
         return GridView.builder(
@@ -519,4 +516,3 @@ class _FeatureItem {
   _FeatureItem(
       this.title, this.subtitle, this.icon, this.color, this.badge, this.onTap);
 }
-

@@ -20,8 +20,10 @@ class _ManageFacultyScreenState extends State<ManageFacultyScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = AppTheme.isDark(context);
-    return Scaffold(
-      appBar: AppBar(title: const Text('Manage Faculty')),
+    return CampusScaffold(
+      title: 'Manage Faculty',
+      subtitle: 'Maintain faculty profiles, expertise, and availability.',
+      icon: Icons.person_rounded,
       body: StreamBuilder<List<FacultyModel>>(
         stream: _supabaseService.getFaculties(),
         builder: (context, snapshot) {

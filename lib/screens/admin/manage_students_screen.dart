@@ -23,16 +23,16 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Students'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => _showSearchDialog(),
-          ),
-        ],
-      ),
+    return CampusScaffold(
+      title: 'Manage Students',
+      subtitle: 'Create and update student access for college resources.',
+      icon: Icons.people_rounded,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () => _showSearchDialog(),
+        ),
+      ],
       body: StreamBuilder<List<UserModel>>(
         stream: _supabaseService.getStudents(),
         builder: (context, snapshot) {
@@ -99,8 +99,8 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         leading: CircleAvatar(
-          backgroundColor: AppTheme.primary.withValues(alpha: 
-              AppTheme.isDark(context) ? 0.2 : 0.1),
+          backgroundColor: AppTheme.primary
+              .withValues(alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
           radius: 24,
           child: Text(
             student.name.isNotEmpty ? student.name[0].toUpperCase() : '?',
@@ -127,7 +127,8 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
               children: [
                 ThemedChip(text: student.department, color: AppTheme.primary),
                 const SizedBox(width: 6),
-                ThemedChip(text: 'Sem ${student.semester}', color: AppTheme.success),
+                ThemedChip(
+                    text: 'Sem ${student.semester}', color: AppTheme.success),
               ],
             ),
           ],
@@ -157,12 +158,14 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
         final ctrl = TextEditingController(text: _searchQuery);
         return AlertDialog(
           title: const Text('Search Students'),
-          content: TextField(
-            controller: ctrl,
-            autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'Search by name, email, or department',
-              prefixIcon: Icon(Icons.search),
+          content: SingleChildScrollView(
+            child: TextField(
+              controller: ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Search by name, email, or department',
+                prefixIcon: Icon(Icons.search),
+              ),
             ),
           ),
           actions: [
@@ -190,7 +193,11 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => _StudentDialog(adminUser: widget.adminUser, supabaseService: _supabaseService, authService: _authService, onReLoginNeeded: _showReLoginDialog),
+      builder: (ctx) => _StudentDialog(
+          adminUser: widget.adminUser,
+          supabaseService: _supabaseService,
+          authService: _authService,
+          onReLoginNeeded: _showReLoginDialog),
     );
   }
 
@@ -201,23 +208,25 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: const Text('Re-sign In'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Creating student accounts requires re-authentication.'),
-            const SizedBox(height: 16),
-            Text('Email: $adminEmail',
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passwordCtrl,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Your Admin Password',
-                prefixIcon: Icon(Icons.lock_outline),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Creating student accounts requires re-authentication.'),
+              const SizedBox(height: 16),
+              Text('Email: $adminEmail',
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Your Admin Password',
+                  prefixIcon: Icon(Icons.lock_outline),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           ElevatedButton(
@@ -240,7 +249,12 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
   void _showEditDialog(UserModel student) {
     showDialog(
       context: context,
-      builder: (ctx) => _StudentDialog(adminUser: widget.adminUser, supabaseService: _supabaseService, authService: _authService, onReLoginNeeded: _showReLoginDialog, student: student),
+      builder: (ctx) => _StudentDialog(
+          adminUser: widget.adminUser,
+          supabaseService: _supabaseService,
+          authService: _authService,
+          onReLoginNeeded: _showReLoginDialog,
+          student: student),
     );
   }
 
@@ -296,7 +310,7 @@ class _StudentDialogState extends State<_StudentDialog> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _nameCtrl = TextEditingController();
-  
+
   String? _selectedDeptId;
   String? _selectedDeptName;
   String? _selectedSemester;
@@ -321,15 +335,16 @@ class _StudentDialogState extends State<_StudentDialog> {
   Future<void> _loadMasterData() async {
     final depts = await widget.supabaseService.getDepartments().first;
     final classes = await widget.supabaseService.getClasses().first;
-    
+
     if (mounted) {
       setState(() {
         _departments = depts;
         _classes = classes;
-        
+
         if (depts.isNotEmpty) {
           if (_selectedDeptName != null) {
-            final match = depts.where((d) => d.name == _selectedDeptName).toList();
+            final match =
+                depts.where((d) => d.name == _selectedDeptName).toList();
             if (match.isNotEmpty) {
               _selectedDeptId = match.first.id;
             } else {
@@ -341,10 +356,14 @@ class _StudentDialogState extends State<_StudentDialog> {
             _selectedDeptName = depts.first.name;
           }
         }
-        
+
         if (_selectedSemester != null && _selectedDeptId != null) {
-           final semMatch = _classes.where((c) => c.departmentId == _selectedDeptId && c.semester == _selectedSemester).toList();
-           if (semMatch.isEmpty) _selectedSemester = null;
+          final semMatch = _classes
+              .where((c) =>
+                  c.departmentId == _selectedDeptId &&
+                  c.semester == _selectedSemester)
+              .toList();
+          if (semMatch.isEmpty) _selectedSemester = null;
         }
 
         _loadingData = false;
@@ -356,60 +375,83 @@ class _StudentDialogState extends State<_StudentDialog> {
   Widget build(BuildContext context) {
     if (_loadingData) {
       return const AlertDialog(
-        content: SizedBox(height: 100, child: Center(child: CircularProgressIndicator())),
+        content: SizedBox(
+            height: 100, child: Center(child: CircularProgressIndicator())),
       );
     }
 
     if (_departments.isEmpty) {
       return AlertDialog(
         title: const Text('Missing Data'),
-        content: const Text('No departments found. Please add a department in "Manage Departments" first.'),
+        content: const Text(
+            'No departments found. Please add a department in "Manage Departments" first.'),
         actions: [
-          ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))
+          ElevatedButton(
+              onPressed: () => Navigator.pop(context), child: const Text('OK'))
         ],
       );
     }
 
     final isEdit = widget.student != null;
-    
+
     // Filter classes by selected department
-    final availableClasses = _classes.where((c) => c.departmentId == _selectedDeptId).map((c) => c.semester).toSet().toList();
-    if (availableClasses.isNotEmpty && (_selectedSemester == null || !availableClasses.contains(_selectedSemester))) {
-       _selectedSemester = availableClasses.first;
+    final availableClasses = _classes
+        .where((c) => c.departmentId == _selectedDeptId)
+        .map((c) => c.semester)
+        .toSet()
+        .toList();
+    if (availableClasses.isNotEmpty &&
+        (_selectedSemester == null ||
+            !availableClasses.contains(_selectedSemester))) {
+      _selectedSemester = availableClasses.first;
     }
 
     return AlertDialog(
-      title: Text(isEdit ? 'Edit Student Account' : 'Create Student Account', style: const TextStyle(fontWeight: FontWeight.bold)),
+      title: Text(isEdit ? 'Edit Student Account' : 'Create Student Account',
+          style: const TextStyle(fontWeight: FontWeight.bold)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _nameCtrl,
-              decoration: const InputDecoration(labelText: 'Full Name *', prefixIcon: Icon(Icons.person_outline)),
+              decoration: const InputDecoration(
+                  labelText: 'Full Name *',
+                  prefixIcon: Icon(Icons.person_outline)),
             ),
             const SizedBox(height: 12),
             if (!isEdit) ...[
               TextField(
                 controller: _emailCtrl,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'Email *', prefixIcon: Icon(Icons.email_outlined)),
+                decoration: const InputDecoration(
+                    labelText: 'Email *',
+                    prefixIcon: Icon(Icons.email_outlined)),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _passwordCtrl,
-                decoration: const InputDecoration(labelText: 'Password *', hintText: 'Min 6 characters', prefixIcon: Icon(Icons.lock_outline)),
+                decoration: const InputDecoration(
+                    labelText: 'Password *',
+                    hintText: 'Min 6 characters',
+                    prefixIcon: Icon(Icons.lock_outline)),
               ),
               const SizedBox(height: 12),
             ],
             DropdownButtonFormField<String>(
               initialValue: _selectedDeptId,
-              decoration: const InputDecoration(labelText: 'Department', prefixIcon: Icon(Icons.business_outlined)),
-              items: _departments.map((d) => DropdownMenuItem(value: d.id, child: Text(d.name))).toList(),
+              decoration: const InputDecoration(
+                  labelText: 'Department',
+                  prefixIcon: Icon(Icons.business_outlined)),
+              items: _departments
+                  .map(
+                      (d) => DropdownMenuItem(value: d.id, child: Text(d.name)))
+                  .toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedDeptId = val;
-                  _selectedDeptName = _departments.firstWhere((d) => d.id == val).name;
+                  _selectedDeptName =
+                      _departments.firstWhere((d) => d.id == val).name;
                   _selectedSemester = null; // reset semester
                 });
               },
@@ -418,28 +460,44 @@ class _StudentDialogState extends State<_StudentDialog> {
             if (availableClasses.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('No classes/semesters found for this department. Add them in "Manage Classes" first.', style: TextStyle(color: Colors.red, fontSize: 12)),
+                child: Text(
+                    'No classes/semesters found for this department. Add them in "Manage Classes" first.',
+                    style: TextStyle(color: Colors.red, fontSize: 12)),
               )
             else
               DropdownButtonFormField<String>(
                 initialValue: _selectedSemester,
-                decoration: const InputDecoration(labelText: 'Semester/Class', prefixIcon: Icon(Icons.school_outlined)),
-                items: availableClasses.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                decoration: const InputDecoration(
+                    labelText: 'Semester/Class',
+                    prefixIcon: Icon(Icons.school_outlined)),
+                items: availableClasses
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
                 onChanged: (val) => setState(() => _selectedSemester = val),
               ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: _saving ? null : () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+            onPressed: _saving ? null : () => Navigator.pop(context),
+            child: const Text('Cancel')),
         ElevatedButton(
           onPressed: _saving || availableClasses.isEmpty
               ? null
               : () async {
-                  if (_nameCtrl.text.trim().isEmpty) return;
-                  if (!isEdit && (_emailCtrl.text.trim().isEmpty || _passwordCtrl.text.trim().isEmpty)) return;
+                  if (_nameCtrl.text.trim().isEmpty) {
+                    return;
+                  }
+                  if (!isEdit &&
+                      (_emailCtrl.text.trim().isEmpty ||
+                          _passwordCtrl.text.trim().isEmpty)) {
+                    return;
+                  }
                   if (!isEdit && _passwordCtrl.text.trim().length < 6) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password must be at least 6 characters')));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content:
+                            Text('Password must be at least 6 characters')));
                     return;
                   }
 
@@ -455,7 +513,9 @@ class _StudentDialogState extends State<_StudentDialog> {
                       await widget.authService.updateUser(updated);
                       if (mounted) {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ Student updated!')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('✅ Student updated!')));
                       }
                     } else {
                       final adminEmail = widget.adminUser.email;
@@ -469,7 +529,11 @@ class _StudentDialogState extends State<_StudentDialog> {
                       );
                       Navigator.pop(context);
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('✅ Student created! Please sign in again.'), backgroundColor: AppTheme.success));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    '✅ Student created! Please sign in again.'),
+                                backgroundColor: AppTheme.success));
                         widget.onReLoginNeeded(adminEmail);
                       }
                     }
@@ -479,16 +543,23 @@ class _StudentDialogState extends State<_StudentDialog> {
                     final message = detail.contains('already')
                         ? 'Email already registered.'
                         : 'Failed: ${e.message}';
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(message)));
                   } catch (e) {
                     setState(() => _saving = false);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('Error: $e')));
                   }
                 },
-          child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Save'),
+          child: _saving
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white))
+              : const Text('Save'),
         ),
       ],
     );
   }
 }
-

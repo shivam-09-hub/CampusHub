@@ -1,7 +1,183 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../config/app_theme.dart';
 
-// ─── Dashboard Feature Card ───────────────────────────────────────────────────
+class CampusScaffold extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Widget body;
+  final List<Widget>? actions;
+  final Widget? floatingActionButton;
+  final Widget? headerTrailing;
+  final bool showHeader;
+
+  const CampusScaffold({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.body,
+    this.actions,
+    this.floatingActionButton,
+    this.headerTrailing,
+    this.showHeader = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title), actions: actions),
+      floatingActionButton: floatingActionButton,
+      body: Container(
+        decoration: BoxDecoration(gradient: AppTheme.screenGradient(context)),
+        child: Column(
+          children: [
+            if (showHeader)
+              CampusScreenHeader(
+                title: title,
+                subtitle: subtitle,
+                icon: icon,
+                trailing: headerTrailing,
+              ),
+            Expanded(child: body),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CampusScreenHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Widget? trailing;
+
+  const CampusScreenHeader({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = AppTheme.isDark(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: AppTheme.headerGradient,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.22),
+              ),
+              boxShadow: AppTheme.glowShadow(AppTheme.primary, intensity: 0.2),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.20)),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 26),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.82),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12.5,
+                          height: 1.25,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (trailing != null) ...[
+                  const SizedBox(width: 10),
+                  trailing!,
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CampusIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final String tooltip;
+  final Color? color;
+
+  const CampusIconButton({
+    super.key,
+    required this.icon,
+    required this.onTap,
+    required this.tooltip,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = color ?? AppTheme.primary;
+    final isDark = AppTheme.isDark(context);
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: tint.withValues(alpha: isDark ? 0.18 : 0.1),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+                color: tint.withValues(alpha: isDark ? 0.25 : 0.18)),
+          ),
+          child: Icon(icon, color: tint, size: 21),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Dashboard Feature Card (Glassmorphic) ────────────────────────────────────
 
 class DashboardCard extends StatefulWidget {
   final String title;
@@ -67,12 +243,14 @@ class _DashboardCardState extends State<DashboardCard>
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppTheme.cardColor(context),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : AppTheme.elevatedSurface(context),
             borderRadius: AppTheme.cardRadius,
-            boxShadow: AppTheme.adaptiveShadow(context),
+            boxShadow: AppTheme.premiumShadow(context),
             border: Border.all(
               color: isDark
-                  ? widget.color.withValues(alpha: 0.25)
+                  ? widget.color.withValues(alpha: 0.20)
                   : widget.color.withValues(alpha: 0.12),
             ),
           ),
@@ -84,8 +262,18 @@ class _DashboardCardState extends State<DashboardCard>
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: widget.color.withValues(alpha: isDark ? 0.2 : 0.1),
+                      gradient: LinearGradient(
+                        colors: [
+                          widget.color.withValues(alpha: isDark ? 0.25 : 0.15),
+                          widget.color.withValues(alpha: isDark ? 0.10 : 0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: widget.color.withValues(alpha: 0.15),
+                      ),
                     ),
                     child: Icon(widget.icon, color: widget.color, size: 26),
                   ),
@@ -95,7 +283,8 @@ class _DashboardCardState extends State<DashboardCard>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: widget.color.withValues(alpha: isDark ? 0.2 : 0.1),
+                        color:
+                            widget.color.withValues(alpha: isDark ? 0.2 : 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -146,8 +335,6 @@ class _DashboardCardState extends State<DashboardCard>
   }
 }
 
-// Using Flutter's built-in AnimatedBuilder — no custom wrapper needed.
-
 // ─── Loading Overlay ──────────────────────────────────────────────────────────
 
 class LoadingOverlay extends StatelessWidget {
@@ -169,27 +356,38 @@ class LoadingOverlay extends StatelessWidget {
         child,
         if (isLoading)
           Container(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: Colors.black.withValues(alpha: 0.4),
             child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: AppTheme.cardColor(context),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: AppTheme.softShadow,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(color: AppTheme.primary),
-                    if (message != null) ...[
-                      const SizedBox(height: 16),
-                      Text(message!,
-                          style: TextStyle(
-                              color: AppTheme.subtitleColor(context),
-                              fontSize: 14)),
-                    ],
-                  ],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    padding: const EdgeInsets.all(32),
+                    decoration: BoxDecoration(
+                      color: AppTheme.isDark(context)
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.white.withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.15),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(
+                            color: AppTheme.primary),
+                        if (message != null) ...[
+                          const SizedBox(height: 16),
+                          Text(message!,
+                              style: TextStyle(
+                                  color: AppTheme.subtitleColor(context),
+                                  fontSize: 14)),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -227,14 +425,28 @@ class EmptyStateWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: isDark ? 0.15 : 0.08),
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.primary
+                        .withValues(alpha: isDark ? 0.15 : 0.08),
+                    AppTheme.secondary
+                        .withValues(alpha: isDark ? 0.08 : 0.04),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppTheme.primary
+                      .withValues(alpha: isDark ? 0.20 : 0.10),
+                ),
               ),
               child: Icon(icon,
                   size: 56,
-                  color: AppTheme.primary.withValues(alpha: isDark ? 0.6 : 0.4)),
+                  color:
+                      AppTheme.primary.withValues(alpha: isDark ? 0.6 : 0.4)),
             ),
             const SizedBox(height: 24),
             Text(title,
@@ -284,12 +496,16 @@ class StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor(context),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: AppTheme.adaptiveShadow(context),
-        border: isDark
-            ? Border.all(color: color.withValues(alpha: 0.2))
-            : null,
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : AppTheme.elevatedSurface(context),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: AppTheme.premiumShadow(context),
+        border: Border.all(
+          color: isDark
+              ? color.withValues(alpha: 0.18)
+              : AppTheme.borderColor(context),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,8 +513,13 @@ class StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: isDark ? 0.2 : 0.1),
-              borderRadius: BorderRadius.circular(10),
+              gradient: LinearGradient(
+                colors: [
+                  color.withValues(alpha: isDark ? 0.25 : 0.12),
+                  color.withValues(alpha: isDark ? 0.10 : 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 20),
           ),
@@ -349,8 +570,7 @@ class SectionTitle extends StatelessWidget {
           if (actionLabel != null)
             TextButton(
               onPressed: onAction,
-              child: Text(actionLabel!,
-                  style: const TextStyle(fontSize: 13)),
+              child: Text(actionLabel!, style: const TextStyle(fontSize: 13)),
             ),
         ],
       ),
@@ -359,7 +579,6 @@ class SectionTitle extends StatelessWidget {
 }
 
 // ─── Themed List Card ────────────────────────────────────────────────────────
-// Reusable card wrapper for list items across all manage screens.
 
 class ThemedListCard extends StatelessWidget {
   final Widget child;
@@ -369,15 +588,20 @@ class ThemedListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppTheme.isDark(context);
     return Container(
       margin: margin ?? const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor(context),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.05)
+            : AppTheme.elevatedSurface(context),
         borderRadius: BorderRadius.circular(18),
-        boxShadow: AppTheme.adaptiveShadow(context),
-        border: AppTheme.isDark(context)
-            ? Border.all(color: AppTheme.borderColor(context))
-            : null,
+        boxShadow: AppTheme.premiumShadow(context),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.10)
+              : AppTheme.borderColor(context),
+        ),
       ),
       child: child,
     );
@@ -396,10 +620,13 @@ class ThemedChip extends StatelessWidget {
   Widget build(BuildContext context) {
     if (text.isEmpty) return const SizedBox.shrink();
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: AppTheme.chipBgColor(context, color),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: color.withValues(alpha: 0.15),
+        ),
       ),
       child: Text(text,
           style: TextStyle(
@@ -430,7 +657,7 @@ void showAppSnackBar(BuildContext context, String message,
     ),
     backgroundColor: isError ? AppTheme.error : AppTheme.success,
     behavior: SnackBarBehavior.floating,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
   ));
 }
 
@@ -466,4 +693,3 @@ class ThemeToggleButton extends StatelessWidget {
     );
   }
 }
-

@@ -12,10 +12,13 @@ class StudentNoticesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Notices')),
+    return CampusScaffold(
+      title: 'Notices',
+      subtitle: 'Latest announcements for your department and semester.',
+      icon: Icons.campaign_rounded,
       body: StreamBuilder<List<NoticeModel>>(
-        stream: SupabaseService().getNoticesForStudent(department: user.department, semester: user.semester),
+        stream: SupabaseService().getNoticesForStudent(
+            department: user.department, semester: user.semester),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -34,7 +37,8 @@ class StudentNoticesScreen extends StatelessWidget {
             itemCount: notices.length,
             itemBuilder: (_, i) {
               final n = notices[i];
-              final date = DateFormat('MMM d, yyyy • h:mm a').format(n.createdAt);
+              final date =
+                  DateFormat('MMM d, yyyy • h:mm a').format(n.createdAt);
               return ThemedListCard(
                 child: Padding(
                   padding: const EdgeInsets.all(18),
@@ -46,12 +50,12 @@ class StudentNoticesScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B).withValues(alpha: 
-                                  AppTheme.isDark(context) ? 0.2 : 0.1),
-                              borderRadius: BorderRadius.circular(10),
+                              color: AppTheme.accent.withValues(
+                                  alpha: AppTheme.isDark(context) ? 0.2 : 0.1),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.campaign_rounded,
-                                color: Color(0xFFF59E0B), size: 20),
+                            child: Icon(Icons.campaign_rounded,
+                                color: AppTheme.accent, size: 20),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -95,4 +99,3 @@ class StudentNoticesScreen extends StatelessWidget {
     );
   }
 }
-
